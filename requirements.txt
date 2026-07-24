@@ -1,0 +1,13 @@
+# Invisibility Cloak - Dependencies
+# Install with: pip install -r requirements.txt
+#
+# Notes:
+# - mediapipe currently supports Python 3.9 - 3.11. If you're on 3.12+,
+#   create a virtual environment pinned to 3.11 (see README.md).
+# - opencv-python includes GUI support (cv2.imshow). If you're on a headless
+#   server, you'd need opencv-python-headless instead + a different display
+#   mechanism (not covered here, since this app needs a live webcam window).
+
+opencv-python>=4.9.0
+mediapipe>=0.10.9
+numpy>=1.24.0,<2.0.0
