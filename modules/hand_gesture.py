@@ -19,7 +19,7 @@ Why debounce ("smoothing_window" / majority vote)?
     agree.
 """
 
-import mediapipe as mp
+import mediapipe as mp 
 import numpy as np
 from collections import deque
 
