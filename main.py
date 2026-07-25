@@ -55,8 +55,24 @@ def main():
     segmenter = PersonSegmenter()
     bg_manager = BackgroundManager()
 
+    # --- Diagnose + fix display sizing ---
+    # Some webcams/drivers ignore the CAP_PROP_FRAME_WIDTH/HEIGHT request and
+    # silently fall back to a different (often smaller) native resolution.
+    # We print what we actually got so it's obvious if there's a mismatch,
+    # and we create the window as WINDOW_NORMAL (resizable + auto-scaling)
+    # instead of the OpenCV default WINDOW_AUTOSIZE, which shows the frame
+    # at literal native pixel size and pads the rest of the window with
+    # gray if you resize/maximize it.
+    actual_w = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
+    actual_h = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
+    print(f">>> Requested {FRAME_WIDTH}x{FRAME_HEIGHT}, camera actually gave us {actual_w}x{actual_h}")
+
+    WINDOW_NAME = "Invisibility Cloak"
+    cv2.namedWindow(WINDOW_NAME, cv2.WINDOW_NORMAL)
+    cv2.resizeWindow(WINDOW_NAME, FRAME_WIDTH, FRAME_HEIGHT)
+
     print(">>> Step out of frame. Calibrating background...")
-    bg_manager.calibrate(cap, num_frames=CALIBRATION_FRAMES)
+    bg_manager.calibrate(cap, num_frames=CALIBRATION_FRAMES, target_size=(FRAME_WIDTH, FRAME_HEIGHT))
     print(">>> Background captured. You may step back in.")
 
     # cloak_amount ranges 0.0 (fully visible) -> 1.0 (fully invisible).
@@ -72,6 +88,12 @@ def main():
         if not ok:
             print("Warning: failed to read frame from camera.")
             continue
+
+        # Force a consistent size regardless of what the camera natively
+        # gave us -- this keeps the frame, background plate, and mask all
+        # aligned, and keeps our on-screen text positions correct.
+        if frame.shape[1] != FRAME_WIDTH or frame.shape[0] != FRAME_HEIGHT:
+            frame = cv2.resize(frame, (FRAME_WIDTH, FRAME_HEIGHT))
 
         frame = cv2.flip(frame, 1)  # mirror -- feels like looking in a mirror
         frame_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
@@ -125,7 +147,7 @@ def main():
                 cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 200, 255), 1
             )
 
-        cv2.imshow("Invisibility Cloak", composited)
+        cv2.imshow(WINDOW_NAME, composited)
 
         key = cv2.waitKey(1) & 0xFF
         if key == ord('q') or key == 27:  # 'q' or ESC

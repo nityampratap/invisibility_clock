@@ -22,19 +22,29 @@ class BackgroundManager:
         self.background = None
         self.adapt_rate = adapt_rate
 
-    def calibrate(self, cap, num_frames=60):
+    def calibrate(self, cap, num_frames=60, target_size=None):
         """
         Captures and averages `num_frames` frames to build the initial
         clean background plate. The user must step out of frame while this
         runs. Averaging multiple frames (rather than taking one snapshot)
         reduces ordinary sensor/compression noise in the plate.
+
+        target_size: optional (width, height) tuple. If the camera's native
+        resolution doesn't match what main.py requested (some
+        webcams/drivers ignore CAP_PROP_FRAME_WIDTH/HEIGHT), we resize here
+        too -- otherwise the background plate and the later live frames
+        would be different shapes and fail to composite together.
         """
+        import cv2  # local import to keep this module's only hard dependency numpy
+
         frames = []
         collected = 0
         while collected < num_frames:
             ok, frame = cap.read()
             if not ok:
                 continue
+            if target_size is not None and (frame.shape[1], frame.shape[0]) != target_size:
+                frame = cv2.resize(frame, target_size)
             frames.append(frame.astype(np.float32))
             collected += 1
 
