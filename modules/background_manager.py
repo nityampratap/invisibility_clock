@@ -35,7 +35,7 @@ class BackgroundManager:
         too -- otherwise the background plate and the later live frames
         would be different shapes and fail to composite together.
         """
-        import cv2  # local import to keep this module's only hard dependency numpy
+        import cv2  # local import to keep this module's only hard dependency numpy .
 
         frames = []
         collected = 0
