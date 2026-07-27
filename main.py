@@ -35,8 +35,8 @@ from modules.background_manager import BackgroundManager
 CAM_INDEX = 0
 FRAME_WIDTH = 960
 FRAME_HEIGHT = 540
-CALIBRATION_FRAMES = 60          # frames averaged to build the initial background
-CROSSFADE_SPEED = 0.12           # how fast the effect ramps in/out, per frame (0-1)
+CALIBRATION_FRAMES = 60          # ....frames averaged to build the initial background
+CROSSFADE_SPEED = 0.12           # ....how fast the effect ramps in/out, per frame (0-1)
 SHOW_DEBUG_OVERLAY = True        # draw hand skeleton + status text
 
 
